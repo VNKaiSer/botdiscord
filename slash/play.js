@@ -5,29 +5,29 @@ const { QueryType } = require("discord-player")
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("play")
-        .setDescription("loads songs from youtube")
+        .setDescription("Phát bài hát từ link du túp")
         .addSubcommand((subcommand) =>
             subcommand
             .setName("song")
-            .setDescription("Loads a single song from a url")
-            .addStringOption((option) => option.setName("url").setDescription("the song's url").setRequired(true))
+            .setDescription("Phát một bài hát mà mi cóp ti từ du túp")
+            .addStringOption((option) => option.setName("url").setDescription("Link bài hát").setRequired(true))
         )
         .addSubcommand((subcommand) =>
             subcommand
             .setName("playlist")
-            .setDescription("Loads a playlist of songs from a url")
-            .addStringOption((option) => option.setName("url").setDescription("the playlist's url").setRequired(true))
+            .setDescription("Phát môt cái phờ lay dít từ link du túp")
+            .addStringOption((option) => option.setName("url").setDescription("Link phờ lay lít url").setRequired(true))
         )
         .addSubcommand((subcommand) =>
             subcommand
             .setName("search")
-            .setDescription("Searches for sogn based on provided keywords")
+            .setDescription("Tìm bài hát theo từ khúa")
             .addStringOption((option) =>
-                option.setName("searchterms").setDescription("the search keywords").setRequired(true)
+                option.setName("searchterms").setDescription("Từ khúa").setRequired(true)
             )
         ),
     run: async({ client, interaction }) => {
-        if (!interaction.member.voice.channel) return interaction.editReply("You need to be in a VC to use this command")
+        if (!interaction.member.voice.channel) return interaction.editReply("Dô phòng ngồi đi chòi oyyyy")
 
         const queue = await client.player.createQueue(interaction.guild)
         if (!queue.connection) await queue.connect(interaction.member.voice.channel)
@@ -41,13 +41,13 @@ module.exports = {
                 searchEngine: QueryType.YOUTUBE_VIDEO
             })
             if (result.tracks.length === 0)
-                return interaction.editReply("No results")
+                return interaction.editReply("Méo thấy")
 
             const song = result.tracks[0]
             await queue.addTrack(song)
-            embed.setDescription(`**[${song.title}](${song.url})** has been added to the Queue`)
+            embed.setDescription(`**[${song.title}](${song.url})** đã được thêm vào hàng chờ`)
                 .setThumbnail(song.thumbnail)
-                .setFooter({ text: `Duration: ${song.duration}` })
+                .setFooter({ text: `Thời gian: ${song.duration}` })
 
         } else if (interaction.options.getSubcommand() === "playlist") {
             let url = interaction.options.getString("url")
@@ -62,9 +62,9 @@ module.exports = {
             const playlist = result.playlist
             await queue.addTracks(result.tracks)
             embed
-                .setDescription(`**${result.tracks.length} songs from [${playlist.title}](${playlist.url})** have been added to the Queue`)
+                .setDescription(`**${result.tracks.length} songs from [${playlist.title}](${playlist.url})** đã được thêm vào hàng chờ`)
                 .setThumbnail(playlist.thumbnail)
-                .setFooter({ text: `Duration: ${playlist.duration}` })
+                .setFooter({ text: `Thời gian: ${playlist.duration}` })
         } else if (interaction.options.getSubcommand() === "search") {
             let url = interaction.options.getString("searchterms")
             const result = await client.player.search(url, {
@@ -73,14 +73,14 @@ module.exports = {
             })
 
             if (result.tracks.length === 0)
-                return interaction.editReply("No results")
+                return interaction.editReply("Méo thấy")
 
             const song = result.tracks[0]
             await queue.addTrack(song)
             embed
-                .setDescription(`**[${song.title}](${song.url})** has been added to the Queue`)
+                .setDescription(`**[${song.title}](${song.url})** đã được thêm vào hàng chờ`)
                 .setThumbnail(song.thumbnail)
-                .setFooter({ text: `Duration: ${song.duration}` })
+                .setFooter({ text: `Thời gian: ${song.duration}` })
         }
         if (!queue.playing) await queue.play()
         await interaction.editReply({
